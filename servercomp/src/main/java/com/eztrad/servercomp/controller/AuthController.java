@@ -5,6 +5,9 @@ import com.eztrad.servercomp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +22,31 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping ("/signup")
-    public ResponseEntity<User> register(@RequestBody User user){
+    public ResponseEntity<User> register(@RequestBody User user) throws Exception {
+
+
+        // Step 24 - email existence checkup
+        User isEmailExist = userRepository.findByEmail(user.getEmail());
+
+        if(isEmailExist!=null){
+            throw new Exception("email is already used with another account");
+        }
+
+        // Step 11 - this and below return part is_belongs to step 11 not step 24
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
         newUser.setFullName(user.getFullName());
 
         User savedUser = userRepository.save(newUser);
+
+        // this also belongs to Step 24 - copied from JwtTokenValidator and modified the getters
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                user.getEmail(),
+                user.getPassword()
+        );
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
 
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
 
@@ -36,6 +57,8 @@ public class AuthController {
         //           at HomeController but with it you can see the signup/login page and in terminal there is a line
         //           with generated password (user : user , password : prompted in terminal like
         //           Using generated security password: adbc4e24-43c6-46c9-904d-0b6f6fdbcf8b  )
+
+
 
 
     }
