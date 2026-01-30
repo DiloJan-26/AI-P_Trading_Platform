@@ -1,19 +1,28 @@
 package com.eztrad.servercomp.controller;
 
+import com.eztrad.servercomp.config.JwtProvider;
+import com.eztrad.servercomp.model.TwoFactorOTP;
 import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.repository.UserRepository;
+import com.eztrad.servercomp.response.AuthResponse;
+import com.eztrad.servercomp.service.CustomUserDetailsService;
+import com.eztrad.servercomp.service.TwoFactorOTPService;
+import com.eztrad.servercomp.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CachingUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// step 11 - auth controller created set and get user credentials
+// step 11 - auth controller created , set and get user credentials
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -21,8 +30,16 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    // belongs to step 29 for login
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    // belongs to step 37
+    @Autowired
+    private TwoFactorOTPService twoFactorOTPService;
+
     @PostMapping ("/signup")
-    public ResponseEntity<User> register(@RequestBody User user) throws Exception {
+    public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
 
 
         // Step 24 - email existence checkup
@@ -32,7 +49,7 @@ public class AuthController {
             throw new Exception("email is already used with another account");
         }
 
-        // Step 11 - this and below return part is_belongs to step 11 not step 24
+        // Step 11 - this and end return part is_belongs to step 11 not step 24 or 26
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setPassword(user.getPassword());
@@ -47,8 +64,19 @@ public class AuthController {
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
 
+        //step 26 - create jwt token
+        String jwt = JwtProvider.generateToken(auth);
 
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        //step 28 - from now our signup method is perfectly ready
+        // when you go and post at http://localhost:5455/auth/signup in postman your credential return a jwt token
+        AuthResponse res = new AuthResponse();
+        res.setJwt(jwt);
+        res.setStatus(true);
+        res.setMessage("register success");
+
+
+        // after the 28th step res parameter added for return but it belongs to step 11
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
 
         // step 12 - go with postman check the post method with the url of http://localhost:5455/auth/signup to create user
         // step 13 - next add the jwt dependencies to pom.yml -> from mvn repository(jjwt-api, jjwt-impl, jjwt-jackson)
@@ -61,5 +89,52 @@ public class AuthController {
 
 
 
+    }
+    //-------------------------------------------------------
+    // step 29 - lets create login method
+    // it entirely copied like above post_mapping of signup and modified for login
+    @PostMapping ("/signin")
+    public ResponseEntity<AuthResponse> login(@RequestBody User user) throws Exception {
+
+        String userName = user.getEmail();
+        String password = user.getPassword();
+
+        Authentication auth = authenticate(userName, password);
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        String jwt = JwtProvider.generateToken(auth);
+
+        // step 35 - 2 factor auth enabled what to do
+        if(user.getTwoFactorAuth().isEnabled()){
+            AuthResponse res = new AuthResponse();
+            res.setMessage("TwoFactorAuth is Enabled");
+            res.setIsTwoFactorAuthEnabled(true);
+            String otp = OtpUtils.generateOTP();
+
+            // Step 37 - after otp_utils creation
+            TwoFactorOTP oldTwoFactorOTP = twoFactorOTPService.findByUser(user.getId());
+        }
+        // down part is not belongs to step 35 that belongs step 29
+
+        AuthResponse res = new AuthResponse();
+        res.setJwt(jwt);
+        res.setStatus(true);
+        res.setMessage("login success");
+
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
+    }
+
+    private Authentication authenticate(String userName, String password) {
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+
+        if(userDetails==null){
+            throw new BadCredentialsException("Invalid Username");
+        }
+
+        if(!password.equals(userDetails.getPassword())){
+            throw new BadCredentialsException("Invalid Password");
+        }
+        return  new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
     }
 }

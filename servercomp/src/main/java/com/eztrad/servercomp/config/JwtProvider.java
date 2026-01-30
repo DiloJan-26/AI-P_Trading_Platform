@@ -1,5 +1,6 @@
 package com.eztrad.servercomp.config;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
@@ -19,8 +20,8 @@ public class JwtProvider {
         String roles = populateAuthorities(authorities);
 
         String jwt = Jwts.builder()
-                .setIssuedAt(new Date())
-                .setExpiration(new Date().getTime()+86400000)
+                .issuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000L))
                 .claim("email",auth.getName())
                 .claim("authorities",roles)
                 .signWith(key)
@@ -31,6 +32,10 @@ public class JwtProvider {
 
     public static String getEmailFromToken(String token){
         token = token.substring(7);
+        // copied at JwtTokenValidator
+        Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        String email = String.valueOf(claims.get("email"));
+        return email;
     }
 
     private static String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
