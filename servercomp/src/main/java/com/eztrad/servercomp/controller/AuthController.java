@@ -6,6 +6,7 @@ import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.repository.UserRepository;
 import com.eztrad.servercomp.response.AuthResponse;
 import com.eztrad.servercomp.service.CustomUserDetailsService;
+import com.eztrad.servercomp.service.EmailService;
 import com.eztrad.servercomp.service.TwoFactorOTPService;
 import com.eztrad.servercomp.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 // step 11 - auth controller created , set and get user credentials
 @RestController
@@ -37,6 +35,11 @@ public class AuthController {
     // belongs to step 37
     @Autowired
     private TwoFactorOTPService twoFactorOTPService;
+
+    // belongs to step 39
+    @Autowired
+    private EmailService emailService;
+
 
     @PostMapping ("/signup")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
@@ -105,6 +108,8 @@ public class AuthController {
 
         String jwt = JwtProvider.generateToken(auth);
 
+        User authUser = userRepository.findByEmail(userName); // belongs to step 37
+
         // step 35 - 2 factor auth enabled what to do
         if(user.getTwoFactorAuth().isEnabled()){
             AuthResponse res = new AuthResponse();
@@ -113,7 +118,22 @@ public class AuthController {
             String otp = OtpUtils.generateOTP();
 
             // Step 37 - after otp_utils creation
-            TwoFactorOTP oldTwoFactorOTP = twoFactorOTPService.findByUser(user.getId());
+            TwoFactorOTP oldTwoFactorOTP = twoFactorOTPService.findByUser(authUser.getId());
+            if(oldTwoFactorOTP!=null){
+                twoFactorOTPService.deleteTwoFactorOtp(oldTwoFactorOTP);
+            }
+            TwoFactorOTP newTwoFactorOTP = twoFactorOTPService.createTwoFactorOtp(
+                    authUser,
+                    otp,
+                    jwt
+            );
+
+            // Step 39 - mail_sender
+            emailService.sendVerificationOtpEmail(userName,otp);
+            // above part only related to step 39
+
+            res.setSession(newTwoFactorOTP.getId());
+            return new ResponseEntity<>(res, HttpStatus.ACCEPTED);
         }
         // down part is not belongs to step 35 that belongs step 29
 
@@ -122,7 +142,7 @@ public class AuthController {
         res.setStatus(true);
         res.setMessage("login success");
 
-        return new ResponseEntity<>(res, HttpStatus.CREATED);
+        return new ResponseEntity<>(res, HttpStatus.CREATED); // this is belongs to step 37
     }
 
     private Authentication authenticate(String userName, String password) {
@@ -136,5 +156,23 @@ public class AuthController {
             throw new BadCredentialsException("Invalid Password");
         }
         return  new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+    }
+
+    // Step 40 - varifying login otp
+    @PostMapping("/two-factor/otp/{otp}")
+    public ResponseEntity<AuthResponse> verifySighInOtp(
+            @PathVariable String otp,
+            @RequestParam String id) throws Exception {
+
+        TwoFactorOTP twoFactorOTP = twoFactorOTPService.findById(id);
+
+        if(twoFactorOTPService.verifyTwoFactorOtp(twoFactorOTP,otp)){
+            AuthResponse res = new AuthResponse();
+            res.setMessage("two factor authentication verified");
+            res.setIsTwoFactorAuthEnabled(true);
+            res.setJwt(twoFactorOTP.getJwt());
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }
+        throw new Exception("invalid otp");
     }
 }
