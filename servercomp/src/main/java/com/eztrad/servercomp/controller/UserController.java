@@ -6,6 +6,7 @@ import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.model.VerificationCode;
 import com.eztrad.servercomp.request.ForgotPasswordTokenRequest;
 import com.eztrad.servercomp.request.ResetPasswordRequest;
+import com.eztrad.servercomp.response.ApiResponse;
 import com.eztrad.servercomp.response.AuthResponse;
 import com.eztrad.servercomp.service.*;
 import com.eztrad.servercomp.utils.OtpUtils;
@@ -124,7 +125,7 @@ public class UserController {
     // belongs to also the step 54
     // before this go to step 56 - resetPasswordRequest and come
     @PatchMapping("/auth/users/reset-password/verify-otp")
-    public ResponseEntity<User> resetPassword(
+    public ResponseEntity<ApiResponse> resetPassword(
             @RequestParam String id,
             @RequestBody ResetPasswordRequest req,
             @RequestHeader("Authorization") String jwt) throws Exception {
@@ -133,9 +134,19 @@ public class UserController {
 
         boolean isVerified= forgotPasswordToken.getOtp().equals(req.getOtp());
 
-        return null;
-
+        // go to step 57 - for ApiResponse and come
+        if(isVerified){
+            userService.updatePassword(forgotPasswordToken.getUser(), req.getPassword());
+            ApiResponse res = new ApiResponse();
+            res.setMessage("password update successfully");
+            return new ResponseEntity<>(res, HttpStatus.ACCEPTED);
+        }
+        throw new Exception("wrong otp");
     }
 
-
+     // after the step 54/57 we will move on to create coinGecko api - 03:56:00 - real_time_data for coin - https://docs.coingecko.com/
+     // then direct to https://docs.coingecko.com/v3.0.1/reference/coins-list => there right hand side u can see the curl request pannal
+     // there --url 'the api' => for this part I recommend to watch the tutorial video of the section
+     // so there you can followup most important practical flow of getting realtime data through api
+     // watch from 03:56:00
 }
