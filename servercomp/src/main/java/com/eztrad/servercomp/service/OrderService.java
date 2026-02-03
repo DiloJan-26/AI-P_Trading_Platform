@@ -14,11 +14,11 @@ public interface OrderService {
 
     Order createOrder(User user, OrderItem orderItem, OrderType orderType);
 
-    Order gerOrderById(Long orderId);
+    Order gerOrderById(Long orderId) throws Exception;
 
     List<Order> getAllOrdersOfUsers(Long userId, OrderType orderType, String assetSymbol);
 
-    Order processOrder(Coin coin, double quantity, OrderType orderType, User user);
+    Order processOrder(Coin coin, double quantity, OrderType orderType, User user) throws Exception;
 
     // Step 74 - go and create and write Implementation for it - OrderServiceImplement
 }
