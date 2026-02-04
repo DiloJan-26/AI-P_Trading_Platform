@@ -6,6 +6,7 @@ import com.eztrad.servercomp.model.Order;
 import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.model.Wallet;
 import com.eztrad.servercomp.model.WalletTransaction;
+import com.eztrad.servercomp.service.OrderService;
 import com.eztrad.servercomp.service.UserService;
 import com.eztrad.servercomp.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,10 @@ public class WalletController {
 
     @Autowired
     private UserService userService;
+
+    // belongs to step 89
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
@@ -56,11 +61,17 @@ public class WalletController {
             @PathVariable Long orderId
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
-//        Order order = orderService.
-//        Wallet wallet = walletService.payOrderPayment(order,user)
 
-//        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
-        return null;
+        // Step 89 - I already comment it at step 73 and came back now and do the changes because that time order service wasn't created
+        Order order = orderService.gerOrderById(orderId);
+        // above only related to step 89
+
+        Wallet wallet = walletService.payOrderPayment(order,user);
+
+        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+
+        // Now let's move to create withdrawal api
+        // Step 90 - create a model as Withdrawal
     }
 
 

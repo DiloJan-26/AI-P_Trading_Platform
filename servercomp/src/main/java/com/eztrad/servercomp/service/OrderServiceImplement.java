@@ -2,10 +2,7 @@ package com.eztrad.servercomp.service;
 
 import com.eztrad.servercomp.domain.OrderStatus;
 import com.eztrad.servercomp.domain.OrderType;
-import com.eztrad.servercomp.model.Coin;
-import com.eztrad.servercomp.model.Order;
-import com.eztrad.servercomp.model.OrderItem;
-import com.eztrad.servercomp.model.User;
+import com.eztrad.servercomp.model.*;
 import com.eztrad.servercomp.repository.OrderItemRepository;
 import com.eztrad.servercomp.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +27,11 @@ public class OrderServiceImplement implements OrderService{
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    // belongs to step 87
+    @Autowired
+    private AssetService assetService;
+
+
     @Override
     public Order createOrder(User user, OrderItem orderItem, OrderType orderType) {
         double price = orderItem.getCoin().getCurrentPrice()*orderItem.getQuantity(); // * or .
@@ -52,7 +54,7 @@ public class OrderServiceImplement implements OrderService{
     }
 
     @Override
-    public List<Order> getAllOrdersOfUsers(Long userId, OrderType orderType, String assetSymbol) {
+    public List<Order> getAllOrdersOfUser(Long userId, OrderType orderType, String assetSymbol) {
         return orderRepository.findByUserId(userId);
     }
 
@@ -87,6 +89,19 @@ public class OrderServiceImplement implements OrderService{
         Order savedOrder = orderRepository.save(order);
 
         // Create asset part is skipped for now will come later
+        // Step 87 - this will continue after step 86 - asset controller
+
+        Asset oldAsset = assetService.findAssetByUserIdAndCoinId(
+                order.getUser().getId(),
+                order.getOrderItem().getCoin().getId());
+
+        if(oldAsset==null){
+            assetService.createAsset(user,orderItem.getCoin(),orderItem.getQuantity());
+        }else {
+            assetService.updateAsset(oldAsset.getId(),quantity);
+        }
+
+        // the above only belongs to step 87
 
         return savedOrder;
     }
@@ -100,24 +115,38 @@ public class OrderServiceImplement implements OrderService{
             throw new Exception("quantity should be > 0");
         }
         double sellPrice = coin.getCurrentPrice();
-        double buyPrice = assetToSell.getPrice();
-        OrderItem orderItem = createOrderItem(coin,quantity,buyPrice,sellPrice);
-        Order order = createOrder(user, orderItem, OrderType.SELL);
 
-        if(assetToSell.getQuantity()>=quantity){
-            order.setStatus(OrderStatus.SUCCESS);
-            order.setOrderType(OrderType.SELL);
-            Order savedOrder = orderRepository.save(order);
+        // Step 88 - this will continue after step 87
 
-            walletService.payOrderPayment(order,user);
+        Asset assetToSell = assetService.findAssetByUserIdAndCoinId(user.getId(), coin.getId());
 
-            Asset updatedAsset = assetService.updateAsset(assetToSell.getId(),-quantity);
-            if(updatedAsset.getQuantity()*coin.getCurrentPrice()<=1){
-                assetService.deleteAsset(updatedAsset.getId);
+        if(assetToSell != null){
+
+            double buyPrice = assetToSell.getBuyPrice();
+            OrderItem orderItem = createOrderItem(coin,quantity,buyPrice,sellPrice);
+            Order order = createOrder(user, orderItem, OrderType.SELL);
+
+            if(assetToSell.getQuantity()>=quantity){
+                order.setStatus(OrderStatus.SUCCESS);
+                order.setOrderType(OrderType.SELL);
+                Order savedOrder = orderRepository.save(order);
+
+                walletService.payOrderPayment(order,user);
+
+                Asset updatedAsset = assetService.updateAsset(assetToSell.getId(),-quantity);
+
+                if(updatedAsset.getQuantity()*coin.getCurrentPrice()<=1){
+                    assetService.deleteAsset(updatedAsset.getId());
+                }
+                return savedOrder;
             }
-            return savedOrder;
+            throw new Exception("Insufficient quantity to sell");
+
         }
-        throw new Exception("Insufficient quantity to sell");
+        throw new Exception("asset not found");
+
+        // the above only belongs to step 88
+        // then go to Wallet controller and work with step - 89
 
     }
 
