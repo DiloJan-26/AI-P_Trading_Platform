@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 // Step 64 - Order model
 @Entity
 @Data
+@Table(name = "orders")
 public class Order {
 
     @Id

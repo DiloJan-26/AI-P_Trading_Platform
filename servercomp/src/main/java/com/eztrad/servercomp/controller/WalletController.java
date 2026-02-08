@@ -2,11 +2,9 @@ package com.eztrad.servercomp.controller;
 
 // Step 71 - controller for wallet service
 
-import com.eztrad.servercomp.model.Order;
-import com.eztrad.servercomp.model.User;
-import com.eztrad.servercomp.model.Wallet;
-import com.eztrad.servercomp.model.WalletTransaction;
+import com.eztrad.servercomp.model.*;
 import com.eztrad.servercomp.service.OrderService;
+import com.eztrad.servercomp.service.PaymentService;
 import com.eztrad.servercomp.service.UserService;
 import com.eztrad.servercomp.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,10 @@ public class WalletController {
     // belongs to step 89
     @Autowired
     private OrderService orderService;
+
+    // belongs to step 115
+    @Autowired
+    PaymentService paymentService;
 
     @GetMapping("api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
@@ -74,5 +76,30 @@ public class WalletController {
         // Step 90 - create a model as Withdrawal
     }
 
+    // Step 115 - continue to finish-up wallet controller from Payment controller code period
 
+    @PutMapping("/api/wallet/deposit")
+    public ResponseEntity<Wallet> addBalanceToWallet(
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam(name="order_id") Long orderId,
+            @RequestParam(name="payment_id") String paymentId
+    ) throws Exception {
+        User user = userService.findUserProfileByJwt(jwt);
+        Wallet wallet = walletService.getUserWallet(user);
+        PaymentOrder order = paymentService.getPaymentOrderById(orderId);
+        Boolean status = paymentService.proceedPaymentOrder(order,paymentId);
+
+        if(status){
+            wallet = walletService.addBalance(wallet,order.getAmount());
+        }
+
+        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+
+    }
+
+    // so you finished up all the api by the end of 115th step now on - at 7:48:00
+    // Transaction api part is missing so it will be added by me soon with own understanding - experimental and practical experiencing
+    // Before it go and try it out start to end process to understand the concept
+    // go to properties
+    // since all api are ready then go and check with postman
 }

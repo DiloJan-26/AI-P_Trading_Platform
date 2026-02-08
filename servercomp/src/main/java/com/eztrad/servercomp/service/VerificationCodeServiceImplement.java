@@ -7,10 +7,12 @@ import com.eztrad.servercomp.model.VerificationCode;
 import com.eztrad.servercomp.repository.VerificationCodeRepository;
 import com.eztrad.servercomp.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 // Step 47 - verification code implementation
+@Service
 public class VerificationCodeServiceImplement implements VerificationCodeService {
 
     @Autowired
