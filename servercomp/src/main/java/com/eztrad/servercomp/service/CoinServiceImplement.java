@@ -53,7 +53,7 @@ public class CoinServiceImplement implements CoinService {
 
     @Override
     public String getMarketChart(String coinId, int days) throws Exception {
-        String url = "https://api.coingecko.com/api/v3/coins/"+coinId+"markets?vs_currency=usd&per_page=10&days="+days ;
+        String url = "https://api.coingecko.com/api/v3/coins/"+coinId+"/market_chart?vs_currency=usd&days="+days ;
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -99,13 +99,13 @@ public class CoinServiceImplement implements CoinService {
             coin.setMarketCap(marketData.get("market_cap").get("usd").asLong());
             coin.setMarketCapRank(marketData.get("market_cap_rank").asInt());
             coin.setTotalVolume(marketData.get("total_volume").get("usd").asLong());
-            coin.setHigh24h(marketData.get("high_24").get("usd").asDouble());
-            coin.setLow24h(marketData.get("low_24").get("usd").asDouble());
-            coin.setPriceChange24h(marketData.get("price_change_24h").get("usd").asDouble());
-            coin.setPriceChangePercentage24h(marketData.get("price_change_percentage_24h").get("usd").asDouble());
+            coin.setHigh24h(marketData.get("high_24h").get("usd").asDouble());
+            coin.setLow24h(marketData.get("low_24h").get("usd").asDouble());
+            coin.setPriceChange24h(marketData.get("price_change_24h").asDouble());
+            coin.setPriceChangePercentage24h(marketData.get("price_change_percentage_24h").asDouble());
             coin.setMarketCapChange24h(marketData.get("market_cap_change_24h").asLong());
             coin.setMarketCapChangePercentage24h(marketData.get("market_cap_change_percentage_24h").asLong());
-            coin.setTotalSupply(marketData.get("total_supply").get("usd").asLong());
+            coin.setTotalSupply(marketData.get("total_supply").asLong());
             coinRepository.save(coin);
 
             return response.getBody();
@@ -146,7 +146,7 @@ public class CoinServiceImplement implements CoinService {
     // here also exactly same as get_market_chart override and just url only change
     @Override
     public String getTop50CoinsByMarketCapRank() throws Exception {
-        String url = "https://api.coingecko.com/api/v3/coins/markets/vs_currency=usd&per_page=50&page=1" ;
+        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=50&page=1" ;
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -167,7 +167,8 @@ public class CoinServiceImplement implements CoinService {
     // exactly same as get_market_chart override and just url only change
     @Override
     public String getTradingCoins() throws Exception {
-        String url = "https://api.coingecko.com/api/v3/search/trading";
+        // String url = "https://api.coingecko.com/api/v3/search?query=trading";
+        String url = "https://api.coingecko.com/api/v3/search/trending";
 
         RestTemplate restTemplate = new RestTemplate();
 
