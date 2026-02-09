@@ -33,6 +33,7 @@ public class WatchlistServiceImplement implements WatchlistService {
         return watchlistRepository.save(watchlist);
     }
 
+
     @Override
     public Watchlist findById(Long id) throws Exception {
         Optional<Watchlist> optionalWatchlist = watchlistRepository.findById(id);

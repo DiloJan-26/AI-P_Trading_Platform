@@ -8,6 +8,7 @@ import com.eztrad.servercomp.response.AuthResponse;
 import com.eztrad.servercomp.service.CustomUserDetailsService;
 import com.eztrad.servercomp.service.EmailService;
 import com.eztrad.servercomp.service.TwoFactorOTPService;
+import com.eztrad.servercomp.service.WatchlistService;
 import com.eztrad.servercomp.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,9 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
+    // belongs to testing period above 115 step - 119
+    private WatchlistService watchlistService;
+
 
     @PostMapping ("/signup")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
@@ -59,6 +63,10 @@ public class AuthController {
         newUser.setFullName(user.getFullName());
 
         User savedUser = userRepository.save(newUser);
+
+        // belongs to testing period above 115 step - 119
+//        watchlistService.createWatchlist(savedUser);
+        // above only belongs to step -119
 
         // this also belongs to Step 24 - copied from JwtTokenValidator and modified the getters
         Authentication auth = new UsernamePasswordAuthenticationToken(

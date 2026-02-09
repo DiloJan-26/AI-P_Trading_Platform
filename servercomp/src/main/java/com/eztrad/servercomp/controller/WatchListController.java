@@ -30,7 +30,7 @@ public class WatchListController {
 
     @GetMapping("/user")
     public ResponseEntity<Watchlist> getUserWatchlist(
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
         Watchlist watchlist = watchlistService.findUserWatchlist(user.getId());
