@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 import AssetTable from "./AssetTable";
+import StockChart from "./StockChart";
 
 const Home = () => {
   const [category, setCategory] = React.useState("All");
@@ -50,6 +51,11 @@ const Home = () => {
           </div>
           <AssetTable/>
         </div>
+        {/* Step 13 - Stockchart added */}
+        <div className="hidden lg:w-[50%] lg:block p-5">
+          <StockChart/>
+        </div>
+        {/* Step 13 ended */}
       </div>
     </div>
   );
