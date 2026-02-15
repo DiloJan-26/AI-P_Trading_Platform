@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "./ui/button";
 import { DragHandleHorizontalIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import SideBar from "./SideBar";
 
 
@@ -69,7 +69,9 @@ const Navbar = () => {
       </div>
       {/* Step 9 -  top bar components (avatar)*/}
       <div>
-
+        <Avatar>
+          <AvatarFallback>D</AvatarFallback>
+        </Avatar>
       </div>
       {/* Step 9 -  top bar components (avatar) step ended */}
 
