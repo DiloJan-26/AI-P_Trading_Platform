@@ -6,6 +6,7 @@ import React from 'react'
 import { Button } from './ui/button'
 import { SheetClose } from './ui/sheet'
 import { CreditCardIcon, LandmarkIcon, WalletIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const menu = [
   { name: "Home", path: "/", icon: <HomeIcon className='h-6 w-6' /> },
@@ -21,13 +22,17 @@ const menu = [
 
 
 const SideBar = () => {
+
+  // Step 18 - Route navigation enabled
+  const navigate = useNavigate();
+
   return (
     <div className='m-8 mt-0 space-y-5'>
       {/* insteed of multiple dulications we use map function from menu class for add the button icons in side bar */}
       {menu.map((item) => (
         <div key={item.name}>
         <SheetClose className="w-full">
-        <Button variant='outline' className=" flex items-center gap-4 py-6 w-full">
+        <Button variant='outline' className=" flex items-center gap-4 py-6 w-full" onClick={() => navigate(item.path)}> {/*step 18 - onclick */}
           <span className='w-8'>
             {item.icon}
           </span>

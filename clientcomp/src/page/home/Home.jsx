@@ -7,13 +7,34 @@ import StockChart from "./StockChart";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Cross1Icon, DotIcon } from "@radix-ui/react-icons";
 import { MessageCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const Home = () => {
   const [category, setCategory] = React.useState("All");
+  const [inputValue, setInputValue] = React.useState("");
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
 
   const handleCategory = (cat) => {
     setCategory(cat);
   };
+
+
+  const handleChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      // Handle the enter key press, e.g., send the message
+      console.log("Message sent:", inputValue);
+      setInputValue(""); // Clear the input field after sending
+    }
+  };
+
+  const toggleChat = () => {
+    setIsChatOpen((prev) => !prev);
+  };
+
 
   return (
     <div className="relative">
@@ -84,10 +105,10 @@ const Home = () => {
       </div>
       <section className="absolute bottom-5 right-5 z-40 flex flex-col justify-end items-end gap-2">
         {/* // Step 15 - Chat bot panel */}
-        <div className="rounded-md w-[20rem] md:w-100 lg:w-100 h-[70vh] bg-slate-900">
+        <div className={`rounded-md w-[20rem] md:w-100 lg:w-100 h-[70vh] bg-slate-900 ${isChatOpen ? "block" : "hidden"}`}>
           <div className="flex items-center justify-between border-b px-6 h-[12%]">
             <p>Chat Bot</p>
-            <Button variant="ghost" size="icon">
+            <Button onClick={toggleChat} variant="ghost" size="icon">
               <Cross1Icon />
             </Button>
           </div>
@@ -101,21 +122,34 @@ const Home = () => {
               </div>
             </div>
 
-            <div className={`${true?"self-end":"self-start"} pb-5 w-auto`}>
-              <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
-                <p>your prompt</p>
+            {[1, 1, 1, 1, 1].map((item, index) => (
+              <div
+                key={index}
+                className={`${index % 2 === 0 ? "self-start" : "self-end"} pb-5 w-auto`}
+              >
+                {index % 2 === 0 ? (
+                  <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
+                    <p>your prompt</p>
+                  </div>
+                ) : (
+                  <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
+                    <p>Answer took place</p>
+                  </div>
+                )}
               </div>
-              <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
-                <p>Answer took place</p>
-              </div>
-            </div>
+            ))}
           </div>
+
+          <div className="h-[12%] border-t">
+              <Input placeholder="Type your message here..." onChange={handleChange} value={inputValue} onKeyPress={handleKeyPress} className="w-full h-full outline-none border-none bg-slate-900 text-white focus:ring-0" />
+          </div>
+
         </div>
         {/* // Step 15 ended */}
 
         {/* // Step 14 - Chat bot button */}
         <div className="relative w-40 cursor-pointer group">
-          <Button className="w-full h-12 gap-2 items-center">
+          <Button onClick={toggleChat} className="w-full h-12 gap-2 items-center">
             <MessageCircle
               size={30}
               className="fill-[#1e293b] -rotate-90 stroke-none group-hover:fill-[#1a1a1a]"
@@ -130,3 +164,9 @@ const Home = () => {
 };
 
 export default Home;
+
+
+// here after [step 15] ended you go for pagination for that Install react router dom = npm install react-router-dom
+// Step 16 - after Installing go to Main.jsx and wrap the <App /> component with <BrowserRouter> and then you can add pagination 
+// [you can refer this link = https://reactrouter.com/en/main/components/pagination]
+// Step 17 - then go to App.jsx and add routes
