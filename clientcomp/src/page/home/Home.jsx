@@ -83,24 +83,47 @@ const Home = () => {
         {/* Step 13 ended */}
       </div>
       <section className="absolute bottom-5 right-5 z-40 flex flex-col justify-end items-end gap-2">
-
-        {/* // Step 14 - Chat bot panel */}
+        {/* // Step 15 - Chat bot panel */}
         <div className="rounded-md w-[20rem] md:w-100 lg:w-100 h-[70vh] bg-slate-900">
           <div className="flex items-center justify-between border-b px-6 h-[12%]">
             <p>Chat Bot</p>
             <Button variant="ghost" size="icon">
-              <Cross1Icon/>
+              <Cross1Icon />
             </Button>
           </div>
-        </div>
-        {/* // Step 14 ended */}
 
+          <div className="h-[76%] flex flex-col gap-5 overflow-y-auto px-5 py-2 scroll-container">
+            <div className="self-start pb-5 w-auto">
+              <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
+                <p>hi, dilo</p>
+                <p>you can ask any crypto question</p>
+                <p>like price, market, cap</p>
+              </div>
+            </div>
+
+            <div className={`${true?"self-end":"self-start"} pb-5 w-auto`}>
+              <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
+                <p>your prompt</p>
+              </div>
+              <div className="justify-end self-end px-5 py-2 rounded-md bg-slate-800 w-auto">
+                <p>Answer took place</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* // Step 15 ended */}
+
+        {/* // Step 14 - Chat bot button */}
         <div className="relative w-40 cursor-pointer group">
           <Button className="w-full h-12 gap-2 items-center">
-            <MessageCircle size={30} className="fill-[#1e293b] -rotate-90 stroke-none group-hover:fill-[#1a1a1a]" />
+            <MessageCircle
+              size={30}
+              className="fill-[#1e293b] -rotate-90 stroke-none group-hover:fill-[#1a1a1a]"
+            />
             <span className="text-2xl">Chat Bot</span>
           </Button>
         </div>
+        {/* // Step 14 ended */}
       </section>
     </div>
   );
