@@ -36,7 +36,9 @@ const schema = z
     message: "Account numbers do not match.",
   })
 
-export default function PaymentDetailsDialog() {
+export default function PaymentDetailsDialog({ onSuccess }) {
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -48,15 +50,24 @@ export default function PaymentDetailsDialog() {
     },
   })
 
-  const onSubmit = (values) => {
-    console.log("Payment Details:", values)
-    // TODO: call API
+  const onSubmit = async (values) => {
+    try {
+      setIsSubmitting(true)
+
+      // TODO: replace this with your real API call
+      console.log("Submitting:", values)
+      await new Promise((r) => setTimeout(r, 800))
+
+      // ✅ close dialog only after success
+      onSuccess?.()
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <div className="text-foreground">
-      
-      {/* Form */}
+
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="mt-4 space-y-5"
@@ -68,11 +79,7 @@ export default function PaymentDetailsDialog() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Account holder name</FieldLabel>
-              <Input
-                {...field}
-                placeholder="e.g. DJ comp"
-                className="h-12"
-              />
+              <Input {...field} placeholder="e.g. DJ comp" className="h-12" />
               {fieldState.error && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -136,18 +143,14 @@ export default function PaymentDetailsDialog() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Bank Name</FieldLabel>
-              <Input
-                {...field}
-                placeholder="YES Bank"
-                className="h-12"
-              />
+              <Input {...field} placeholder="YES Bank" className="h-12" />
               {fieldState.error && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
 
-        <Button type="submit" className="h-12 w-full">
-          SUBMIT
+        <Button type="submit" className="h-12 w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "SUBMIT"}
         </Button>
       </form>
     </div>

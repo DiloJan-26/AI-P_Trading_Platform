@@ -1,5 +1,6 @@
 // Step 28 - create a payment details form component and add it to the payment details page
 // there are no form components in officail shadcn ui site but I did older method as 'npx shadcn@latest add form ' for easiness but make sure to use the latest method for form component in future (PaymentDetailsDialog.jsx)
+// so i am not done here just choosed and implemented the form component in PaymentDetailsDialog.jsx so that's worked good
 import { Form } from "@/components/ui/form";
 import React from "react";
 
