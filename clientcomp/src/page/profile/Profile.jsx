@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import StockDetails from "../stockdetails/StockDetails";
 
 function InfoRow({ label, value }) {
   return (
@@ -27,17 +28,17 @@ function InfoRow({ label, value }) {
 export default function Profile() {
   // dummy data (replace with your API/user state)
   const user = {
-    email: "raam@gmail.com",
-    fullName: "code with zosh",
+    email: "djan@gmail.com",
+    fullName: "DJ Comp",
     dob: "25/09/2000",
-    nationality: "Indian",
-    address: "code with zosh",
-    city: "Mumbai",
+    nationality: "Srilankan",
+    address: "DJ Comp",
+    city: "Colombo",
     postcode: "345020",
-    country: "India",
+    country: "Srilanka",
     twoStepEnabled: true,
     accountStatus: "pending",
-    mobile: "+91 8987667899",
+    mobile: "+94 766789922",
   };
 
   return (

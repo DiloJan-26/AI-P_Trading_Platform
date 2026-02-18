@@ -1,9 +1,33 @@
 // Step 11 - asset table component and intergrate it with home page
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import React from 'react'
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import React, { use } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AssetTable = () => {
+  const navigate = useNavigate();
+
+  const assets = [
+    {
+      name: "Bitcoin",
+      symbol: "BTC",
+      image: "./src/assets/bitcoin.png",
+      volume: "$1.2B",
+      marketCap: "$200B",
+      change24h: "+2.5%",
+      price: "$45,000",
+      slug: "bitcoin", // ✅ NEW: URL param value
+    },
+  ];
+
   return (
     <Table>
       <TableHeader>
@@ -18,23 +42,30 @@ const AssetTable = () => {
       </TableHeader>
 
       <TableBody>
-        {[1,1,1,1,1,1,1,1,1,1,1].map((asset, index) =>  <TableRow key={index}>
-          <TableCell className="font-medium flex items-center gap-2">
-            <Avatar className="-z-50">
-              <AvatarImage src="./src/assets/bitcoin.png"/>
-            </Avatar>
-             <span>Bitcoin</span>
-          </TableCell>
-          <TableCell>BTC</TableCell> 
-          <TableCell>$1.2B</TableCell> {/* you can get all details in currect at = api.coingecko.com/api/v3/coins/markets?vs_currency=usd(just for knowledge you can get it via beckend api); but here I used dummy value */ }
-          <TableCell>$200B</TableCell>
-          <TableCell className="text-green-500">+2.5%</TableCell>
-          <TableCell className="text-right">$45,000</TableCell>
-        </TableRow>
-      )}
+        {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((asset, index) => (
+          <TableRow key={index}>
+            <TableCell
+              onClick={() => navigate(`/market/${asset.slug}`)}
+              className="font-medium flex items-center gap-2"
+            >
+              {" "}
+              {/* step 33 - onclick action for navigate to stock details page */}
+              <Avatar className="-z-50">
+                <AvatarImage src="./src/assets/bitcoin.png" />
+              </Avatar>
+              <span>Bitcoin</span>
+            </TableCell>
+            <TableCell>BTC</TableCell>
+            <TableCell>$1.2B</TableCell>{" "}
+            {/* you can get all details in currect at = api.coingecko.com/api/v3/coins/markets?vs_currency=usd(just for knowledge you can get it via beckend api); but here I used dummy value */}
+            <TableCell>$200B</TableCell>
+            <TableCell className="text-green-500">+2.5%</TableCell>
+            <TableCell className="text-right">$45,000</TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
-  )
-}
+  );
+};
 
-export default AssetTable
+export default AssetTable;
