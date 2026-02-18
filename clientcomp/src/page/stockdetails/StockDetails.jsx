@@ -1,6 +1,6 @@
 // Step 17.6 - create a new page for stock details and add dummy content there
 // Step 32 - editing stock details page (step 33 in AssetTable.jsx as onclick action)
-// this is for whenever you click on the stock name in the asset table,
+// this is for whenever you click on the stock icon in the asset table(didn't done until step 35 so have to do later),
 // it will navigate to this page and show the details of that stock. you can add more details as per your requirement.
 // Step 34 - adding dialog component for trading in stock details page
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
