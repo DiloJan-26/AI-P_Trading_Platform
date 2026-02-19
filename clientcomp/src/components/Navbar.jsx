@@ -50,7 +50,7 @@ const Navbar = () => {
                 </div>
               </SheetTitle>
             </SheetHeader>
-            <SideBar/>
+            <SideBar/> {/* Step 7 - SideBar component is created and imported in Navbar.jsx*/}
           </SheetContent>
         </Sheet>
         {/* Step 5 - with Sheet and SideBar integration step ended */}

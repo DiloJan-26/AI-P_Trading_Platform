@@ -46,10 +46,10 @@ const AssetTable = () => {
           <TableRow key={index}>
             <TableCell
               onClick={() => navigate(`/market/${asset.slug}`)}
-              className="font-medium flex items-center gap-2"
-            >
+              className="font-medium flex items-center gap-2 cursor-pointer"
+            >  {/* step 33 - onclick action for navigate to stock details page */}
               {" "}
-              {/* step 33 - onclick action for navigate to stock details page */}
+             
               <Avatar className="-z-50">
                 <AvatarImage src="./src/assets/bitcoin.png" />
               </Avatar>

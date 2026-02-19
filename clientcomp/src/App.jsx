@@ -14,25 +14,37 @@ import Watchlist from "./page/watchList/Watchlist";
 import Profile from "./page/profile/Profile";
 import SearchCoin from "./page/search/SearchCoin";
 import NotFound from "./page/notfound/NotFound";
+import Auth from "./page/auth/Auth";
 
 function App() {
   return (
     <>
-      <Navbar />
-      {/* Step 17 - define all the page routes */} {/* Step 18 - go to sidebar.jsx */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="/activity" element={<Activity />} />
-        <Route path="/wallet" element={<Wallet />} />
-        <Route path="/withdrawal" element={<Withdrawal />} />
-        <Route path="/payment-details" element={<PaymentDetails />} />
-        <Route path="/market/:id" element={<StockDetails />} />
-        <Route path="/watchlist" element={<Watchlist />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/search" element={<SearchCoin />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      {/* Step 37 - connection of auth page with app.jsx */}
+      {true ? (
+        <div>
+          <Navbar />
+          {/* Step 17 - define all the page routes */}{" "}
+          {/* Step 18 - go to sidebar.jsx */}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/activity" element={<Activity />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/withdrawal" element={<Withdrawal />} />
+            <Route path="/payment-details" element={<PaymentDetails />} />
+            <Route path="/market/:id" element={<StockDetails />} />
+            <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/search" element={<SearchCoin />} />
+            <Route path="/signin" element={<Auth />} />
+            <Route path="/signup" element={<Auth />} />
+            <Route path="/forgot-password" element={<Auth />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      ) : (
+        <Auth />
+      )}
     </>
   );
 }

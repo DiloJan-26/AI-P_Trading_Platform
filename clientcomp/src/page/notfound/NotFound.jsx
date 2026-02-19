@@ -1,14 +1,9 @@
 // step 17.11 - create a new page for not found and add dummy content there
 import React from "react";
-import StockDetails from "../stockdetails/StockDetails";
-import StockDetailsx from "../stockdetails/StockDetailsx";
+import { Navigate } from "react-router-dom";
 
 const NotFound = () => {
-  return (
-    <div>
-      <StockDetailsx />
-    </div>
-  );
+  return <Navigate to="/signin" replace />;
 };
 
 export default NotFound;

@@ -34,9 +34,9 @@ const StockDetailsx = () => {
 
             <div>
               <div className="flex items-center gap-2">
-                <p className="font-semibold">ETH</p>
+                <p className="font-semibold">BTC</p>
                 <DotIcon className="text-muted-foreground" />
-                <p className="text-muted-foreground">Ethereum</p>
+                <p className="text-muted-foreground">Bitcoin</p>
               </div>
 
               <div className="flex items-end gap-2">
@@ -62,7 +62,7 @@ const StockDetailsx = () => {
             <Dialog>
               <DialogTrigger asChild>
                 <Button size="lg" className="h-10 px-6">
-                  TREAD
+                  TRADE
                 </Button>
               </DialogTrigger>
 
