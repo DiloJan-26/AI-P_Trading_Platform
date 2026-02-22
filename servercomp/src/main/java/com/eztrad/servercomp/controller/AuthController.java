@@ -42,6 +42,7 @@ public class AuthController {
     private EmailService emailService;
 
     // belongs to testing period above 115 step - 119
+    @Autowired
     private WatchlistService watchlistService;
 
 
@@ -65,7 +66,7 @@ public class AuthController {
         User savedUser = userRepository.save(newUser);
 
         // belongs to testing period above 115 step - 119
-//        watchlistService.createWatchlist(savedUser);
+        watchlistService.createWatchlist(savedUser);
         // above only belongs to step -119
 
         // this also belongs to Step 24 - copied from JwtTokenValidator and modified the getters

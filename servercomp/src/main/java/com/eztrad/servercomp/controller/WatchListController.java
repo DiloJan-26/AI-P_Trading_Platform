@@ -50,7 +50,7 @@ public class WatchListController {
 
     @PatchMapping("/add/coin/{coinId}")
     public ResponseEntity<Coin> addItemToWatchlist(
-            @RequestHeader("Authentication") String jwt,
+            @RequestHeader("Authorization") String jwt,
             @PathVariable String coinId
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);

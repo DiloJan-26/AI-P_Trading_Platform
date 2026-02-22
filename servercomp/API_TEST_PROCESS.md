@@ -3,7 +3,13 @@
 This document provides a comprehensive guide for testing each API endpoint using Postman with step-by-step instructions, including request/response details.
 
 ---
+## DB Cleanup
+```
+drop database ez_trad_db;
+create database ez_trad_db;
+```
 
+---
 ## BASE URL
 ```
 http://localhost:5454

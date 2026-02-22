@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 // Step 64 - Order model
 @Entity
 @Data
-@Table(name = "orders")
+@Table(name = "orders") // because order is a reserved keyword in sql so we have to give it a name
 public class Order {
 
     @Id

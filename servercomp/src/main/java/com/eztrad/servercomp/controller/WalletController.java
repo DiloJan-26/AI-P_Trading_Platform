@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/wallet")
+//@RequestMapping("/api/wallet") no need because all api have different path
 public class WalletController {
 
     @Autowired
