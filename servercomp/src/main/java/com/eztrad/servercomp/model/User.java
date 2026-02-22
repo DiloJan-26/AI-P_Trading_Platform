@@ -1,4 +1,6 @@
 //step 4 - user class created
+// Create the core User entity class with @Entity annotation.
+// Define basic properties: id (auto-generated), fullName, email, and password fields.
 
 package com.eztrad.servercomp.model;
 
@@ -20,7 +22,7 @@ public class User {
     private String password;
 
     // step-9 - 2factor
-    @Embedded
+    @Embedded    // this annotation is used to specify that the properties of the TwoFactorAuth class should be embedded in the User entity's table.
     private TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
 
     // step -6 - user role added
