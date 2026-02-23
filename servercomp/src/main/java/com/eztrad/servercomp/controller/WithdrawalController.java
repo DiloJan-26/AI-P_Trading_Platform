@@ -1,8 +1,11 @@
 package com.eztrad.servercomp.controller;
 
+import com.eztrad.servercomp.domain.WalletTransactionType;
 import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.model.Wallet;
+import com.eztrad.servercomp.model.WalletTransaction;
 import com.eztrad.servercomp.model.Withdrawal;
+import com.eztrad.servercomp.service.TransactionService;
 import com.eztrad.servercomp.service.UserService;
 import com.eztrad.servercomp.service.WalletService;
 import com.eztrad.servercomp.service.WithdrawalService;
@@ -26,13 +29,14 @@ public class WithdrawalController {
     @Autowired
     private UserService userService;
 
-//    @Autowired
-//    private WalletTransactionService walletTransactionService;
+    @Autowired
+    private TransactionService transactionService;
+
 
     @PostMapping("/api/withdrawal/{amount}")
     public ResponseEntity<?> withdrawalRequest(
             @PathVariable Long amount,
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
         Wallet userWallet = walletService.getUserWallet(user);
@@ -40,8 +44,14 @@ public class WithdrawalController {
         Withdrawal withdrawal = withdrawalService.requestWithdrawal(amount,user);
         walletService.addBalance(userWallet, -withdrawal.getAmount());
 
-        // wallet transaction related code come in place later
+        // wallet transaction related code come in place later(final step)
+        WalletTransaction walletTransaction = transactionService.createTransaction(
+                userWallet,
+                WalletTransactionType.WITHDRAWAL,null,
+                "bank account withdrawal",
+                withdrawal.getAmount()
 
+        );
 
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }
@@ -51,7 +61,7 @@ public class WithdrawalController {
     public ResponseEntity<?> proceedWithdrawal(
             @PathVariable Long id,
             @PathVariable Boolean accept,
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
         Withdrawal withdrawal = withdrawalService.proceedWithWithdrawal(id,accept);
@@ -67,7 +77,7 @@ public class WithdrawalController {
 
     @GetMapping("/api/withdrawal")
     public ResponseEntity<List<Withdrawal>> getWithdrawalHistory(
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
 
@@ -79,7 +89,7 @@ public class WithdrawalController {
 
     @GetMapping("/api/admin/withdrawal")
     public ResponseEntity<List<Withdrawal>> getWithdrawalRequest(
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
 

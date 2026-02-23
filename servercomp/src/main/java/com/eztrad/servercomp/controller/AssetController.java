@@ -31,7 +31,7 @@ public class AssetController {
     @GetMapping("/coin/{coinId}/user")
     public ResponseEntity<Asset> getAssetByUserIdAndCoinId(
             @PathVariable String coinId,
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
 
         User user = userService.findUserProfileByJwt(jwt);
@@ -42,7 +42,7 @@ public class AssetController {
 
     @GetMapping()
     public ResponseEntity<List<Asset>> getAssetsForUser(
-            @RequestHeader("Authentication") String jwt
+            @RequestHeader("Authorization") String jwt
     ) throws Exception {
 
         User user = userService.findUserProfileByJwt(jwt);
