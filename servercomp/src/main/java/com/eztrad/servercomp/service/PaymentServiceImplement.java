@@ -37,6 +37,7 @@ public class PaymentServiceImplement implements PaymentService {
         paymentOrder.setUser(user);
         paymentOrder.setAmount(amount);
         paymentOrder.setPaymentMethod(paymentMethod);
+        paymentOrder.setStatus(PaymentOrderStatus.PENDING);  // Set initial status to PENDING
         return paymentOrderRepository.save(paymentOrder);
     }
 
@@ -50,6 +51,11 @@ public class PaymentServiceImplement implements PaymentService {
     // Updated: Removed Razorpay, using only Stripe payment gateway
     @Override
     public Boolean proceedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws Exception {
+
+        // Check if payment order status is null or not PENDING
+        if(paymentOrder.getStatus() == null) {
+            paymentOrder.setStatus(PaymentOrderStatus.PENDING);
+        }
 
         if(paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)){
             // For Stripe payment verification
