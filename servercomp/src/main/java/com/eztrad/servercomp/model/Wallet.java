@@ -17,6 +17,6 @@ public class Wallet {
     @OneToOne   // one to one means one user must have one wallet
     private User user;
 
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
 
 }

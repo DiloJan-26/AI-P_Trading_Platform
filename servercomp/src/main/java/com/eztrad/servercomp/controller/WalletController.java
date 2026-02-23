@@ -3,14 +3,13 @@ package com.eztrad.servercomp.controller;
 // Step 71 - controller for wallet service
 
 import com.eztrad.servercomp.model.*;
-import com.eztrad.servercomp.service.OrderService;
-import com.eztrad.servercomp.service.PaymentService;
-import com.eztrad.servercomp.service.UserService;
-import com.eztrad.servercomp.service.WalletService;
+import com.eztrad.servercomp.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 //@RequestMapping("/api/wallet") no need because all api have different path
@@ -28,7 +27,11 @@ public class WalletController {
 
     // belongs to step 115
     @Autowired
-    PaymentService paymentService;
+    private PaymentService paymentService;
+
+    // Step 116 - Transaction service for wallet transaction history
+    @Autowired
+    private TransactionService transactionService;
 
     @GetMapping("api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
@@ -95,6 +98,18 @@ public class WalletController {
 
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
 
+    }
+
+    // Step 116 - Get wallet transaction history
+    @GetMapping("/api/wallet/transactions")
+    public ResponseEntity<List<WalletTransaction>> getWalletTransactions(
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
+        User user = userService.findUserProfileByJwt(jwt);
+        Wallet wallet = walletService.getUserWallet(user);
+        List<WalletTransaction> transactions = transactionService.getTransactionsByWallet(wallet);
+
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
     // so you finished up all the api by the end of 115th step now on - at 7:48:00

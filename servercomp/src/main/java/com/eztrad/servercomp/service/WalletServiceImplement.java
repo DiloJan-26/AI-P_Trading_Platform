@@ -1,6 +1,7 @@
 package com.eztrad.servercomp.service;
 
 import com.eztrad.servercomp.domain.OrderType;
+import com.eztrad.servercomp.domain.WalletTransactionType;
 import com.eztrad.servercomp.model.Order;
 import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.model.Wallet;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 // Step 65 - wallet service implementation
 // Step 66 - go and create a WalletRepository and come back
@@ -19,12 +21,16 @@ public class WalletServiceImplement implements WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
+    @Autowired
+    private TransactionService transactionService;
+
     @Override
     public Wallet getUserWallet(User user) {
         Wallet wallet = walletRepository.findByUserId(user.getId());
         if(wallet==null){
             wallet = new Wallet();
             wallet.setUser(user);
+            walletRepository.save(wallet);
         }
 
         return wallet;
@@ -63,6 +69,28 @@ public class WalletServiceImplement implements WalletService {
         BigDecimal receiverBalance = recieverWallet.getBalance().add(BigDecimal.valueOf(amount));
         recieverWallet.setBalance(receiverBalance);
         walletRepository.save(recieverWallet);
+
+        // Generate unique transfer ID for linking sender and receiver transactions
+        String transferId = UUID.randomUUID().toString();
+
+        // Create transaction record for sender (debit)
+        transactionService.createTransaction(
+            senderwallet,
+            WalletTransactionType.WALLET_TRANSFER,
+            transferId,
+            "Transfer to wallet ID: " + recieverWallet.getId(),
+            amount
+        );
+
+        // Create transaction record for receiver (credit)
+        transactionService.createTransaction(
+            recieverWallet,
+            WalletTransactionType.WALLET_TRANSFER,
+            transferId,
+            "Transfer from wallet ID: " + senderwallet.getId(),
+            amount
+        );
+
         return senderwallet;
     }
 
