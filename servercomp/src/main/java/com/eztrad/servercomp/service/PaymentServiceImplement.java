@@ -6,15 +6,10 @@ import com.eztrad.servercomp.model.PaymentOrder;
 import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.repository.PaymentOrderRepository;
 import com.eztrad.servercomp.response.PaymentResponse;
-import com.razorpay.Payment;
-import com.razorpay.PaymentLink;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,20 +22,12 @@ public class PaymentServiceImplement implements PaymentService {
     @Autowired
     private PaymentOrderRepository paymentOrderRepository;
 
-    // In to the application.properties file we will give the api keys for stripe and razorpay
-        // razorpay.api.key=YOUR_KEY_ID (we do the step later this suggestion got from chatgpt)
-        // razorpay.api.secret=YOUR_SECRET (we do the step later this suggestion got from chatgpt)
-        // also if any to add for stripe add it
-    // so it can bring like this
-
+    // Stripe API configuration
+    // Add your Stripe secret key in application.properties file
+    // stripe.api.key=your_stripe_secret_key
     @Value("${stripe.api.key}")
     private String stripeSecretKey;
 
-    @Value("${razorpay.api.key}")
-    private String apiKey;
-
-    @Value("${razorpay.api.secret}")
-    private String apiSecretKey;
 
 
 
@@ -59,88 +46,43 @@ public class PaymentServiceImplement implements PaymentService {
     }
 
 
-    // it's a most important step here
-    // In here you proceed with Razorpay maven dependency and also for Stripe Maven dependency
-    // Step 113 - go and search them in website and add it in pom.xml and come back
+    // Step 113 - Payment verification using Stripe only
+    // Updated: Removed Razorpay, using only Stripe payment gateway
     @Override
-    public Boolean proceedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws RazorpayException {
+    public Boolean proceedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws Exception {
 
         if(paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)){
+            // For Stripe payment verification
+            // The paymentId here is actually the Stripe Session ID
+            try {
+                Stripe.apiKey = stripeSecretKey;
 
-            // for Razorpay
-            if(paymentOrder.getPaymentMethod().equals(PaymentMethod.RAZORPAY)){
-                RazorpayClient razorPay = new RazorpayClient(apiKey, apiSecretKey);
-                Payment payment = razorPay.payments.fetch(paymentId);
+                // Retrieve the Stripe Session to verify payment
+                Session session = Session.retrieve(paymentId);
 
-                Integer amount = payment.get("amount");
-                String status = payment.get("status");
-
-                if(status.equals("captured")){
+                // Check if payment was successful
+                if(session.getPaymentStatus().equals("paid")) {
                     paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
+                    paymentOrderRepository.save(paymentOrder);
                     return true;
                 }
+
+                paymentOrder.setStatus(PaymentOrderStatus.FAILED);
+                paymentOrderRepository.save(paymentOrder);
+                return false;
+
+            } catch (StripeException e) {
+                System.out.println("Error verifying Stripe payment: " + e.getMessage());
                 paymentOrder.setStatus(PaymentOrderStatus.FAILED);
                 paymentOrderRepository.save(paymentOrder);
                 return false;
             }
-            paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
-            paymentOrderRepository.save(paymentOrder);
-            return true;
         }
         return false;
     }
 
-    @Override
-    public PaymentResponse createRazorpayPaymentLink(User user, Long amount) throws RazorpayException {
-        Long Amount = amount*100;
-
-        try{
-            // initialize the razorpay client with your keyId and secret
-            RazorpayClient razorpay = new RazorpayClient(apiKey, apiSecretKey);
-
-            // create a json object with the payment link request parameters
-            JSONObject paymentLinkRequest = new JSONObject(); // noted will do at code optimize period
-            paymentLinkRequest.put("amount",amount);
-            paymentLinkRequest.put("currency","INR");
-
-            // create a json object with the custom details
-            JSONObject customer = new JSONObject();
-            customer.put("name", user.getFullName());
-            customer.put("email", user.getEmail());
-            paymentLinkRequest.put("customer", customer);
-
-            // Create the json object with the notification settings
-            JSONObject notify = new JSONObject();
-            notify.put("email", true);
-            paymentLinkRequest.put("notify", notify);
-
-            // set the remainder settings
-            paymentLinkRequest.put("reminder_enable", true);
-
-            // set the callback_url and method
-            paymentLinkRequest.put("callback_url", "http://localhost:5173/wallet");
-            paymentLinkRequest.put("callback_method", "get");
-
-            // create the payment link using the paymentLink.create() method
-            PaymentLink payment = razorpay.paymentLink.create(paymentLinkRequest);
-
-            String paymentLinkId = payment.get("id");
-            String paymentLinkUrl = payment.get("short_url");
-
-            PaymentResponse res = new PaymentResponse();
-            res.setPayment_url(paymentLinkUrl);
-
-            return res;
-
-        } catch (RazorpayException e) {
-
-            System.out.println("Error creating payment link" + e.getMessage());
-            throw new RazorpayException(e.getMessage());
-        }
-    }
-
-
-
+    // Step 114 - Create Stripe payment link with session ID in success URL
+    // Updated: Enhanced to include payment session ID in callback URL for wallet deposit
     @Override
     public PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId) throws StripeException {
 
@@ -149,7 +91,8 @@ public class PaymentServiceImplement implements PaymentService {
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5173/wallet?order_id=" + orderId)
+                // Include {CHECKOUT_SESSION_ID} in success URL - Stripe will replace it with actual session ID
+                .setSuccessUrl("http://localhost:5173/wallet?order_id=" + orderId + "&payment_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl("http://localhost:5173/payment/cancel")
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
@@ -157,7 +100,7 @@ public class PaymentServiceImplement implements PaymentService {
                                 .setPriceData(
                                         SessionCreateParams.LineItem.PriceData.builder()
                                                 .setCurrency("usd")
-                                                .setUnitAmount(amount*100)
+                                                .setUnitAmount(amount*100)  // Stripe uses cents
                                                 .setProductData(
                                                         SessionCreateParams
                                                                 .LineItem

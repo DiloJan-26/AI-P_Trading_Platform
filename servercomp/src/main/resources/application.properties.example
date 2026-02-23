@@ -7,4 +7,10 @@ spring.datasource.username=root
 spring.datasource.password=CHANGE_ME
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
-stripe.api.key=${STRIPE_API_KEY}
+# Stripe Payment Gateway Configuration
+# Get your secret key from: https://dashboard.stripe.com/apikeys
+# For development: use test key (starts with sk_test_)
+# For production: use live key (starts with sk_live_)
+# You can use environment variable ${STRIPE_API_KEY} or direct value
+
+stripe.api.key=your_stripe_secret_key_here

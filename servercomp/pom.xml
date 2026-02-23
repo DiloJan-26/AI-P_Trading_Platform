@@ -106,14 +106,7 @@
 
 
         <!--added additionally-->
-        <!-- Source: https://mvnrepository.com/artifact/com.razorpay/razorpay-java -->
-        <dependency>
-            <groupId>com.razorpay</groupId>
-            <artifactId>razorpay-java</artifactId>
-            <version>1.4.8</version>
-        </dependency>
-
-        <!--added additionally-->
+        <!-- Stripe Payment Gateway Integration -->
         <!-- Source: https://mvnrepository.com/artifact/com.stripe/stripe-java -->
         <dependency>
             <groupId>com.stripe</groupId>
