@@ -31,7 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-# Spring Boot secret config (do not commit)
-**/src/main/resources/application.properties
-**/src/main/resources/application-*.properties
