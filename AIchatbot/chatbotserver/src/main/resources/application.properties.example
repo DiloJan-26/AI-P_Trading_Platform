@@ -9,3 +9,14 @@ spring.datasource.username=root
 spring.datasource.password=your_password
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 #spring.jpa.show-sql: true
+
+# Step 5 - API keys and base URLs (example values)
+# Gemini: use the v1beta generateContent endpoint
+# Example: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
+
+gemini.api.key=YOUR_GEMINI_API_KEY
+gemini.api.base-url=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
+
+# CoinGecko: base URL and optional pro key (free tier can leave key empty)
+coingecko.api.base-url=https://api.coingecko.com/api/v3
+coingecko.api.key=
