@@ -1,5 +1,5 @@
 // Step 38 - creating signin component for auth page (step 36 in Auth.jsx as default view) and then create signup and forgot password component later
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,8 +11,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useDispatch } from "react-redux";
+import { login } from "@/state/auth/Action";
 
 const Signin = ({ onSignup, onForgot }) => {
+  // stc 10 - in the signin component, we will create a form to capture user credentials (email and password) and dispatch the login action when the user submits the form. The login action will make an API call to the backend server to authenticate the user and update the authentication state in the Redux store based on the response from the server.
+  // stc 11 - this is about refine cors error so go to backend > Appconfig.java
+  const dispatch = useDispatch();
+  const [form, setForm] = useState({ email: "", password: "" });
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleLogin = () => {
+    dispatch(login(form));
+  };
+
   return (
     <Card className="w-full max-w-md border-border/50 bg-card/80 shadow-2xl backdrop-blur">
       <CardHeader className="space-y-2 text-center">
@@ -29,10 +43,10 @@ const Signin = ({ onSignup, onForgot }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          <Input type="email" placeholder="enter your email" />
-          <Input type="password" placeholder="Enter your password" />
+          <Input name="email" type="email" placeholder="enter your email" onChange={handleChange} />
+          <Input name="password" type="password" placeholder="Enter your password" onChange={handleChange} />
         </div>
-        <Button className="w-full" size="lg" type="button">
+        <Button className="w-full" size="lg" type="button" onClick={handleLogin}>
           Login
         </Button>
         <Button

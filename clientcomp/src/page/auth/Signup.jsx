@@ -1,6 +1,6 @@
 // Step 39 - creating signup component for auth page (step 36 in Auth.jsx) and then create forgot password component later
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,8 +12,22 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useDispatch } from "react-redux";
+import { register } from "@/state/auth/Action";
 
 const Signup = ({ onSignin }) => {
+
+  // stc 9 - in the signup component, we will create a form to capture user details (full name, email, password) and dispatch the register action when the user submits the form. The register action will make an API call to the backend server to create a new user account and update the authentication state in the Redux store based on the response from the server.
+  const dispatch = useDispatch();
+  const [form, setForm] = useState({ fullName: "", email: "", password: "" });
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleRegister = () => {
+    dispatch(register(form));
+  };
+
   return (
     <Card className="w-full max-w-md border-border/50 bg-card/80 shadow-2xl backdrop-blur">
       <CardHeader className="space-y-2 text-center">
@@ -32,11 +46,11 @@ const Signup = ({ onSignin }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          <Input type="text" placeholder="Enter your full name" />
-          <Input type="email" placeholder="enter your email" />
-          <Input type="password" placeholder="Enter your password" />
+          <Input name="fullName" type="text" placeholder="Enter your full name" onChange={handleChange} />
+          <Input name="email" type="email" placeholder="enter your email" onChange={handleChange} />
+          <Input name="password" type="password" placeholder="Enter your password" onChange={handleChange} />
         </div>
-        <Button className="w-full" size="lg" type="button">
+        <Button className="w-full" size="lg" type="button" onClick={handleRegister}>
           Register
         </Button>
       </CardContent>

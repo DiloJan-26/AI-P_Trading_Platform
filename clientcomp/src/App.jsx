@@ -20,7 +20,7 @@ function App() {
   return (
     <>
       {/* Step 37 - connection of auth page with app.jsx */}
-      {true ? (
+      {false ? (
         <div>
           <Navbar />
           {/* Step 17 - define all the page routes */}{" "}
