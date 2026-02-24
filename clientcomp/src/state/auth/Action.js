@@ -25,6 +25,7 @@ export const register = (userData) => async (dispatch) => {
     const user = response.data;
     console.log("Registration successful:", user);
     dispatch({ type: REGISTER_SUCCESS, payload: user.jwt });
+    localStorage.setItem("jwt", user.jwt); // Store JWT in localStorage for later use
   } catch (error) {
     dispatch({ type: REGISTER_FAILURE, payload: error.message });
     console.error(
@@ -44,6 +45,7 @@ export const login = (userData) => async (dispatch) => {
     const user = response.data;
     console.log("Login successful:", user);
     dispatch({ type: LOGIN_SUCCESS, payload: user.jwt });
+    localStorage.setItem("jwt", user.jwt); // Store JWT in localStorage for later use
   } catch (error) {
     dispatch({ type: LOGIN_FAILURE, payload: error.message });
     console.error(
