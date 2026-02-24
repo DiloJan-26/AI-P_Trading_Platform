@@ -100,7 +100,7 @@ public class WalletController {
 
     }
 
-    // Step 116 - Get wallet transaction history
+    // Step 116.4 - Get wallet transaction history
     @GetMapping("/api/wallet/transactions")
     public ResponseEntity<List<WalletTransaction>> getWalletTransactions(
             @RequestHeader("Authorization") String jwt
@@ -112,10 +112,8 @@ public class WalletController {
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
-    // so you finished up all the api by the end of 115th step now on - at 7:48:00
-    // Step 116 - Transaction api part is missing so it will be added by me soon with own understanding - experimental and practical experiencing
-    // at 09:03:40 - there is a show case about transaction controller get it
-    // Before it go and try it out start to end process to understand the concept
-    // go to properties
+    // so you finished up all the api by the end of 117th step now on - at 7:48:00
+    // Step 117 - go to Transaction api part
+    // go to application.properties
     // since all api are ready then go and check with postman
 }

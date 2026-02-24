@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-// Step 116 - Implementation of TransactionService for wallet transaction management
+// Step 116.2 - Implementation of TransactionService for wallet transaction management
 @Service
 public class TransactionServiceImplement implements TransactionService {
 

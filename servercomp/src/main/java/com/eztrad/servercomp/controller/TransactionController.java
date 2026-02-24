@@ -1,5 +1,5 @@
 package com.eztrad.servercomp.controller;
-// Step final
+// Step final - Step 117 - Transaction api part
 
 import com.eztrad.servercomp.model.User;
 import com.eztrad.servercomp.model.Wallet;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+// Step 117 - Controller for transaction history api to fetch user's wallet transactions
 @RestController
 public class TransactionController {
 
@@ -38,4 +39,8 @@ public class TransactionController {
 
         return new ResponseEntity<>(transactionList, HttpStatus.ACCEPTED);
     }
+
+    // so you finished up all the api by the end of 117th step now on - at 7:48:00
+    // go to application.properties
+    // since all api are ready then go and check with postman
 }

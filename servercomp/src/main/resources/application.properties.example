@@ -1,3 +1,8 @@
+# Step 114.1: Made a copy of application.properties and renamed it to application.properties.example
+# for the purpose of abstracting sensitive information like database credentials and Payment Gateway API keys.
+# only this commited to Git and the actual application.properties is added to .gitignore to prevent accidental commits of sensitive data.
+# for more info read GIT_SECRET_PROTECTION.md
+
 spring.application.name=servercomp
 server.port=5454
 

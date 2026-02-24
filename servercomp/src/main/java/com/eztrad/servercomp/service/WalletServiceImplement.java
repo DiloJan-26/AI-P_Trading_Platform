@@ -21,6 +21,7 @@ public class WalletServiceImplement implements WalletService {
     @Autowired
     private WalletRepository walletRepository;
 
+    // Step 116.3 - Inject TransactionService to manage wallet transactions during transfers and payments
     @Autowired
     private TransactionService transactionService;
 
@@ -54,6 +55,7 @@ public class WalletServiceImplement implements WalletService {
         throw new Exception("wallet not found");
     }
 
+    // step 116.3 - Implement wallet-to-wallet transfer with transaction recording for both sender and receiver
     @Override
     public Wallet walletToWalletTransfer(User sender, Wallet recieverWallet, Long amount) throws Exception {
         Wallet senderwallet = getUserWallet(sender);
@@ -93,6 +95,7 @@ public class WalletServiceImplement implements WalletService {
 
         return senderwallet;
     }
+    // Step 116.3 ended here
 
     // Step 67 - go and create Order model and come back
 

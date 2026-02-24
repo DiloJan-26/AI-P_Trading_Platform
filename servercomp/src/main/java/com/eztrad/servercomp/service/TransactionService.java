@@ -6,7 +6,7 @@ import com.eztrad.servercomp.model.WalletTransaction;
 
 import java.util.List;
 
-// Step 116 - Service for managing wallet transactions and transaction history
+// Step 116.1 - Service for managing wallet transactions and transaction history
 public interface TransactionService {
 
     // Create a new wallet transaction
