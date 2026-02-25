@@ -380,4 +380,115 @@ public class ChatbotServiceImplement implements ChatbotService{
         return response.getBody();
     }
 
-}
+    // ========================================================================
+    // STEP 14 - NEW METHOD: Convert Coin to JSON
+    // ========================================================================
+    // Purpose: Convert Coin object to JSON string for context injection
+    // Input: Coin object with market data
+    // Output: JSON string representation
+    // Used by: cryptoAiChat endpoint to create context for Gemini
+    // ========================================================================
+    @Override
+    public String coinToJson(Coin coin) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("id", coin.getId());
+            json.put("name", coin.getName());
+            json.put("symbol", coin.getSymbol());
+            json.put("currentPrice", coin.getCurrentPrice());
+            json.put("marketCap", coin.getMarketCap());
+            json.put("marketCapRank", coin.getMarketCapRank());
+            json.put("high24h", coin.getHigh24h());
+            json.put("low24h", coin.getLow24h());
+            json.put("priceChange24h", coin.getPriceChange24h());
+            json.put("priceChangePercentage24h", coin.getPriceChangePercentage24h());
+            json.put("marketCapChange24h", coin.getMarketCapChange24h());
+            json.put("marketCapChangePercentage24h", coin.getMarketCapChangePercentage24h());
+            json.put("totalVolume", coin.getTotalVolume());
+            json.put("ath", coin.getAth());
+            json.put("athDate", coin.getAthDate());
+            json.put("atl", coin.getAtl());
+            json.put("atlDate", coin.getAtlDate());
+            json.put("circulating_supply", coin.getCirculatingSupply());
+            json.put("total_supply", coin.getTotalSupply());
+            json.put("max_supply", coin.getMaxSupply());
+            json.put("image", coin.getImage());
+            json.put("lastUpdated", coin.getLastUpdated());
+
+            return json.toString();
+        } catch (Exception e) {
+            return "{}";
+        }
+    }
+
+    // ========================================================================
+    // STEP 14.1 - NEW METHOD: Enhance Prompt with Crypto Data
+    // ========================================================================
+    // Purpose: Inject real-time crypto data into user prompt for Gemini context
+    // Input: userQuestion - original user question
+    //        cryptoDataJson - market data from CoinGecko
+    // Output: Enhanced prompt with market context
+    // Example:
+    //   Input: "what is the current price of bitcoin?"
+    //   Crypto Data: {"id":"bitcoin","currentPrice":45250,"marketCap":880000000000}
+    //   Output: "You are a crypto financial advisor with expertise in cryptocurrency markets.
+    //            Current market data for this query: {...}
+    //            User question: what is the current price of bitcoin?"
+    // Used by: cryptoAiChat endpoint
+    // ========================================================================
+    @Override
+    public String enhancePromptWithCryptoData(String userQuestion, String cryptoDataJson) {
+        return "You are a professional crypto financial advisor with deep expertise in cryptocurrency " +
+                "markets, blockchain technology, and digital assets. Provide detailed, accurate, and " +
+                "professional analysis based on real-time market data.\n\n" +
+                "REAL-TIME MARKET DATA:\n" +
+                cryptoDataJson + "\n\n" +
+                "USER QUESTION:\n" +
+                userQuestion + "\n\n" +
+                "ANALYSIS:\n" +
+                "Provide a comprehensive, professional response based on the current market data above. " +
+                "Include price analysis, market trends, and relevant market insights.";
+    }
+
+    // ========================================================================
+    // STEP 14.2 - NEW METHOD: Extract Clean Text from Gemini Response
+    // ========================================================================
+    // Purpose: Parse Gemini API JSON response and extract readable text
+    // Input: Gemini API JSON response string
+    //        Format: {"candidates":[{"content":{"parts":[{"text":"..."}]}}]}
+    // Output: Clean text answer without JSON wrapper
+    // Error Handling: Returns error message if parsing fails
+    // Used by: cryptoAiChat endpoint to extract readable answer
+    // ========================================================================
+    @Override
+    public String extractGeminiText(String geminiJsonResponse) {
+        try {
+            JSONObject response = new JSONObject(geminiJsonResponse);
+
+            // Navigate: response.candidates[0].content.parts[0].text
+            JSONArray candidates = response.getJSONArray("candidates");
+            if (candidates.length() > 0) {
+                JSONObject candidate = candidates.getJSONObject(0);
+
+                if (candidate.has("content")) {
+                    JSONObject content = candidate.getJSONObject("content");
+
+                    if (content.has("parts")) {
+                        JSONArray parts = content.getJSONArray("parts");
+                        if (parts.length() > 0) {
+                            JSONObject part = parts.getJSONObject(0);
+
+                            if (part.has("text")) {
+                                return part.getString("text");
+                            }
+                        }
+                    }
+                }
+            }
+
+            return "Unable to extract response from Gemini API";
+        } catch (Exception e) {
+            return "Error parsing Gemini response: " + e.getMessage();
+        }
+    }
+};
